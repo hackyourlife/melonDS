@@ -752,7 +752,11 @@ u32 ARMv5::CodeRead32(u32 addr, bool branch)
         //return *(u32*)&CurICacheLine[addr & 0x1C];
     }
 
-    if (CodeMem.Mem) return *(u32*)&CodeMem.Mem[addr & CodeMem.Mask];
+    if (CodeMem.Mem) {
+        u32 val = *(u32*)&CodeMem.Mem[addr & CodeMem.Mask];
+	NDS::trace.read32(addr, val);
+	return val;
+    }
 
     return BusRead32(addr);
 }
@@ -766,12 +770,14 @@ void ARMv5::DataRead8(u32 addr, u32* val)
     {
         DataCycles = 1;
         *val = *(u8*)&ITCM[addr & (ITCMPhysicalSize - 1)];
+        NDS::trace.read8(addr, (u8)*val);
         return;
     }
     if (addr >= DTCMBase && addr < (DTCMBase + DTCMSize))
     {
         DataCycles = 1;
         *val = *(u8*)&DTCM[(addr - DTCMBase) & (DTCMPhysicalSize - 1)];
+        NDS::trace.read8(addr, (u8)*val);
         return;
     }
 
@@ -789,12 +795,14 @@ void ARMv5::DataRead16(u32 addr, u32* val)
     {
         DataCycles = 1;
         *val = *(u16*)&ITCM[addr & (ITCMPhysicalSize - 1)];
+        NDS::trace.read16(addr, (u16)*val);
         return;
     }
     if (addr >= DTCMBase && addr < (DTCMBase + DTCMSize))
     {
         DataCycles = 1;
         *val = *(u16*)&DTCM[(addr - DTCMBase) & (DTCMPhysicalSize - 1)];
+        NDS::trace.read16(addr, (u16)*val);
         return;
     }
 
@@ -812,12 +820,14 @@ void ARMv5::DataRead32(u32 addr, u32* val)
     {
         DataCycles = 1;
         *val = *(u32*)&ITCM[addr & (ITCMPhysicalSize - 1)];
+        NDS::trace.read32(addr, *val);
         return;
     }
     if (addr >= DTCMBase && addr < (DTCMBase + DTCMSize))
     {
         DataCycles = 1;
         *val = *(u32*)&DTCM[(addr - DTCMBase) & (DTCMPhysicalSize - 1)];
+        NDS::trace.read32(addr, *val);
         return;
     }
 
@@ -833,12 +843,14 @@ void ARMv5::DataRead32S(u32 addr, u32* val)
     {
         DataCycles += 1;
         *val = *(u32*)&ITCM[addr & (ITCMPhysicalSize - 1)];
+        NDS::trace.read32(addr, *val);
         return;
     }
     if (addr >= DTCMBase && addr < (DTCMBase + DTCMSize))
     {
         DataCycles += 1;
         *val = *(u32*)&DTCM[(addr - DTCMBase) & (DTCMPhysicalSize - 1)];
+        NDS::trace.read32(addr, *val);
         return;
     }
 
@@ -852,6 +864,7 @@ void ARMv5::DataWrite8(u32 addr, u8 val)
 
     if (addr < ITCMSize)
     {
+        NDS::trace.write8(addr, val);
         DataCycles = 1;
         *(u8*)&ITCM[addr & (ITCMPhysicalSize - 1)] = val;
 #ifdef JIT_ENABLED
@@ -861,6 +874,7 @@ void ARMv5::DataWrite8(u32 addr, u8 val)
     }
     if (addr >= DTCMBase && addr < (DTCMBase + DTCMSize))
     {
+        NDS::trace.write8(addr, val);
         DataCycles = 1;
         *(u8*)&DTCM[(addr - DTCMBase) & (DTCMPhysicalSize - 1)] = val;
         return;
@@ -878,6 +892,7 @@ void ARMv5::DataWrite16(u32 addr, u16 val)
 
     if (addr < ITCMSize)
     {
+        NDS::trace.write16(addr, val);
         DataCycles = 1;
         *(u16*)&ITCM[addr & (ITCMPhysicalSize - 1)] = val;
 #ifdef JIT_ENABLED
@@ -887,6 +902,7 @@ void ARMv5::DataWrite16(u32 addr, u16 val)
     }
     if (addr >= DTCMBase && addr < (DTCMBase + DTCMSize))
     {
+        NDS::trace.write16(addr, val);
         DataCycles = 1;
         *(u16*)&DTCM[(addr - DTCMBase) & (DTCMPhysicalSize - 1)] = val;
         return;
@@ -904,6 +920,7 @@ void ARMv5::DataWrite32(u32 addr, u32 val)
 
     if (addr < ITCMSize)
     {
+        NDS::trace.write32(addr, val);
         DataCycles = 1;
         *(u32*)&ITCM[addr & (ITCMPhysicalSize - 1)] = val;
 #ifdef JIT_ENABLED
@@ -913,6 +930,7 @@ void ARMv5::DataWrite32(u32 addr, u32 val)
     }
     if (addr >= DTCMBase && addr < (DTCMBase + DTCMSize))
     {
+        NDS::trace.write32(addr, val);
         DataCycles = 1;
         *(u32*)&DTCM[(addr - DTCMBase) & (DTCMPhysicalSize - 1)] = val;
         return;
@@ -928,6 +946,7 @@ void ARMv5::DataWrite32S(u32 addr, u32 val)
 
     if (addr < ITCMSize)
     {
+        NDS::trace.write32(addr, val);
         DataCycles += 1;
         *(u32*)&ITCM[addr & (ITCMPhysicalSize - 1)] = val;
 #ifdef JIT_ENABLED
@@ -937,6 +956,7 @@ void ARMv5::DataWrite32S(u32 addr, u32 val)
     }
     if (addr >= DTCMBase && addr < (DTCMBase + DTCMSize))
     {
+        NDS::trace.write32(addr, val);
         DataCycles += 1;
         *(u32*)&DTCM[(addr - DTCMBase) & (DTCMPhysicalSize - 1)] = val;
         return;

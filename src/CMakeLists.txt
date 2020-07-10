@@ -42,6 +42,8 @@ add_library(core STATIC
 	Savestate.cpp
 	SPI.cpp
 	SPU.cpp
+	trace.h
+	trace.cpp
 	types.h
 	version.h
 	Wifi.cpp

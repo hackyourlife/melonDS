@@ -480,6 +480,9 @@ void ARM::TriggerIRQ()
     if (CPSR & 0x80)
         return;
 
+    if(!Num)
+        NDS::trace.irq(this);
+
     u32 oldcpsr = CPSR;
     CPSR &= ~0xFF;
     CPSR |= 0xD2;
@@ -562,6 +565,7 @@ void ARMv5::Execute()
         {
             // prefetch
             R[15] += 2;
+		NDS::trace.step9(this);
             CurInstr = NextInstr[0];
             NextInstr[0] = NextInstr[1];
             if (R[15] & 0x2) { NextInstr[1] >>= 16; CodeCycles = 0; }
@@ -575,6 +579,7 @@ void ARMv5::Execute()
         {
             // prefetch
             R[15] += 4;
+		NDS::trace.step9(this);
             CurInstr = NextInstr[0];
             NextInstr[0] = NextInstr[1];
             NextInstr[1] = CodeRead32(R[15], false);

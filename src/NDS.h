@@ -21,6 +21,7 @@
 
 #include "Savestate.h"
 #include "types.h"
+#include "trace.h"
 
 // when touching the main loop/timing code, pls test a lot of shit
 // with this enabled, to make sure it doesn't desync
@@ -177,6 +178,8 @@ extern u32 KeyInput;
 
 const u32 ARM7WRAMSize = 0x10000;
 extern u8* ARM7WRAM;
+
+extern Trace trace;
 
 bool Init();
 void DeInit();

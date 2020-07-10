@@ -156,6 +156,8 @@ u32 KeyInput;
 u16 KeyCnt;
 u16 RCnt;
 
+Trace trace("trace.trc");
+
 bool Running;
 
 bool RunningGame;
@@ -476,6 +478,8 @@ void Reset()
         printf("ARM9 BIOS loaded\n");
         fclose(f);
     }
+
+    trace.dump(0xFFFFF000, 0x1000, ARM9BIOS);
 
     f = Platform::OpenLocalFile(Config::BIOS7Path, "rb");
     if (!f)
@@ -1831,7 +1835,7 @@ void debug(u32 param)
 
 
 
-u8 ARM9Read8(u32 addr)
+u8 ARM9Read8i(u32 addr)
 {
     if ((addr & 0xFFFFF000) == 0xFFFF0000)
     {
@@ -1896,7 +1900,7 @@ u8 ARM9Read8(u32 addr)
     return 0;
 }
 
-u16 ARM9Read16(u32 addr)
+u16 ARM9Read16i(u32 addr)
 {
     if ((addr & 0xFFFFF000) == 0xFFFF0000)
     {
@@ -1961,7 +1965,7 @@ u16 ARM9Read16(u32 addr)
     return 0;
 }
 
-u32 ARM9Read32(u32 addr)
+u32 ARM9Read32i(u32 addr)
 {
     if ((addr & 0xFFFFF000) == 0xFFFF0000)
     {
@@ -2026,7 +2030,7 @@ u32 ARM9Read32(u32 addr)
     return 0;
 }
 
-void ARM9Write8(u32 addr, u8 val)
+void ARM9Write8i(u32 addr, u8 val)
 {
     switch (addr & 0xFF000000)
     {
@@ -2082,7 +2086,7 @@ void ARM9Write8(u32 addr, u8 val)
     printf("unknown arm9 write8 %08X %02X\n", addr, val);
 }
 
-void ARM9Write16(u32 addr, u16 val)
+void ARM9Write16i(u32 addr, u16 val)
 {
     switch (addr & 0xFF000000)
     {
@@ -2157,7 +2161,7 @@ void ARM9Write16(u32 addr, u16 val)
     //printf("unknown arm9 write16 %08X %04X\n", addr, val);
 }
 
-void ARM9Write32(u32 addr, u32 val)
+void ARM9Write32i(u32 addr, u32 val)
 {
     switch (addr & 0xFF000000)
     {
@@ -2263,6 +2267,44 @@ bool ARM9GetMemRegion(u32 addr, bool write, MemRegion* region)
     return false;
 }
 
+u8 ARM9Read8(u32 addr)
+{
+	u8 val = ARM9Read8i(addr);
+	trace.read8(addr, val);
+	return val;
+}
+
+u16 ARM9Read16(u32 addr)
+{
+	u16 val = ARM9Read16i(addr);
+	trace.read16(addr, val);
+	return val;
+}
+
+u32 ARM9Read32(u32 addr)
+{
+	u32 val = ARM9Read32i(addr);
+	trace.read32(addr, val);
+	return val;
+}
+
+void ARM9Write8(u32 addr, u8 val)
+{
+	trace.write8(addr, val);
+	ARM9Write8i(addr, val);
+}
+
+void ARM9Write16(u32 addr, u16 val)
+{
+	trace.write16(addr, val);
+	ARM9Write16i(addr, val);
+}
+
+void ARM9Write32(u32 addr, u32 val)
+{
+	trace.write32(addr, val);
+	ARM9Write32i(addr, val);
+}
 
 
 u8 ARM7Read8(u32 addr)

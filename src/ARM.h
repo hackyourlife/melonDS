@@ -23,6 +23,7 @@
 
 #include "types.h"
 #include "NDS.h"
+#include "trace.h"
 
 #define ROR(x, n) (((x) >> (n)) | ((x) << (32-(n))))
 
