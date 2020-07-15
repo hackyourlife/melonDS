@@ -25,6 +25,11 @@ struct STEP9 {
 	u32	data[17];
 };
 
+Trace::Trace()
+{
+	trc = NULL;
+}
+
 Trace::Trace(std::string filename)
 {
 	open(filename);
@@ -32,6 +37,9 @@ Trace::Trace(std::string filename)
 
 void Trace::open(std::string filename)
 {
+	if(trc)
+		fclose(trc);
+
 	// open file
 	trc = fopen(filename.c_str(), "wb");
 	if(!trc)
@@ -53,6 +61,9 @@ Trace::~Trace()
 
 void Trace::step9(const ARMv5* cpu)
 {
+	if(!trc)
+		return;
+
 	int wr = 0;
 	STEP9 step = {};
 	step.type = TYPE_STEP9;
@@ -78,12 +89,18 @@ void Trace::step9(const ARMv5* cpu)
 
 void Trace::irq(const ARM* cpu)
 {
+	if(!trc)
+		return;
+
 	u8 type = TYPE_IRQ;
 	fwrite(&type, 1, 1, trc);
 }
 
 void Trace::read8(const u32 addr, const u8 value)
 {
+	if(!trc)
+		return;
+
 	u8 tmp[2] = { TYPE_READ_8, value };
 	fwrite(tmp, 2, 1, trc);
 	fwrite(&addr, 4, 1, trc);
@@ -91,6 +108,9 @@ void Trace::read8(const u32 addr, const u8 value)
 
 void Trace::write8(const u32 addr, const u8 value)
 {
+	if(!trc)
+		return;
+
 	u8 tmp[2] = { TYPE_WRITE_8, value };
 	fwrite(tmp, 2, 1, trc);
 	fwrite(&addr, 4, 1, trc);
@@ -98,6 +118,9 @@ void Trace::write8(const u32 addr, const u8 value)
 
 void Trace::read16(const u32 addr, const u16 value)
 {
+	if(!trc)
+		return;
+
 	u8 tmp[3] = { TYPE_READ_16, (u8) value, (u8) (value >> 8) };
 	fwrite(tmp, 3, 1, trc);
 	fwrite(&addr, 4, 1, trc);
@@ -105,6 +128,9 @@ void Trace::read16(const u32 addr, const u16 value)
 
 void Trace::write16(const u32 addr, const u16 value)
 {
+	if(!trc)
+		return;
+
 	u8 tmp[3] = { TYPE_WRITE_16, (u8) value, (u8) (value >> 8) };
 	fwrite(tmp, 3, 1, trc);
 	fwrite(&addr, 4, 1, trc);
@@ -112,6 +138,9 @@ void Trace::write16(const u32 addr, const u16 value)
 
 void Trace::read32(const u32 addr, const u32 value)
 {
+	if(!trc)
+		return;
+
 	u8 type = TYPE_READ_32;
 	u32 tmp[2] = { value, addr };
 	fwrite(&type, 1, 1, trc);
@@ -120,6 +149,9 @@ void Trace::read32(const u32 addr, const u32 value)
 
 void Trace::write32(const u32 addr, const u32 value)
 {
+	if(!trc)
+		return;
+
 	u8 type = TYPE_WRITE_32;
 	u32 tmp[2] = { value, addr };
 	fwrite(&type, 1, 1, trc);
@@ -128,6 +160,9 @@ void Trace::write32(const u32 addr, const u32 value)
 
 void Trace::dump(const u32 addr, const u32 size, const u8* data)
 {
+	if(!trc)
+		return;
+
 	u8 type = TYPE_DUMP;
 	u32 tmp[2] = { addr, size };
 	fwrite(&type, 1, 1, trc);

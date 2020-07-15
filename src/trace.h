@@ -21,6 +21,7 @@ private:
 	u64	step = 0;
 
 public:
+	Trace();
 	Trace(std::string filename);
 	~Trace();
 

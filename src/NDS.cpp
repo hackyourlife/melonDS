@@ -812,6 +812,7 @@ bool DoSavestate(Savestate* file)
     if (!file->Saving)
     {
         GPU::SetPowerCnt(PowerControl9);
+        trace.dump(0x02000000, 0x400000, MainRAM);
     }
 
 #ifdef JIT_ENABLED
